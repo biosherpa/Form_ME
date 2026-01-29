@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Informe de Méritos - URJC EID (Editable)</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+    :root { --urjc-red: #cc0000; --urjc-dark: #333; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f4; padding: 20px; color: #333; }
+    .container { max-width: 950px; margin: 0 auto; background: white; padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; }
+    /* Cabecera */
+    .header-web { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--urjc-red); padding-bottom: 20px; margin-bottom: 30px; }
+    .header-web img { height: 60px; }
+    .header-web h1 { font-size: 1.2rem; color: var(--urjc-dark); margin: 0; text-align: right; max-width: 65%; font-weight: 700; }
+    h3 { margin-top: 30px; background: #f8f9fa; padding: 10px; border-left: 6px solid var(--urjc-red); color: var(--urjc-dark); font-size: 1.1rem; }
+    .form-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 15px; margin-bottom: 15px; }
+    .col-2 { grid-column: span 2; } .col-3 { grid-column: span 3; } .col-4 { grid-column: span 4; }
+    .col-5 { grid-column: span 5; } .col-6 { grid-column: span 6; } .col-10 { grid-column: span 10; } .col-12 { grid-column: span 12; }
+    label { display: block; font-weight: 700; font-size: 0.8rem; margin-bottom: 5px; color: #555; text-transform: uppercase; }
+    input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 0.95rem; background: #fff; }
+    input:focus, textarea:focus, select:focus { border-color: var(--urjc-red); outline: none; background: #fffdfd; }
+    /* Tarjeta de Publicación */
+    .pub-card { background: #fff; border: 1px solid #e1e1e1; padding: 20px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; border-top: 4px solid var(--urjc-dark); }
+    .pub-badge { position: absolute; top: -12px; left: 20px; background: var(--urjc-dark); color: white; padding: 2px 12px; font-size: 0.8rem; border-radius: 4px; font-weight: bold; }
+    .api-tools { background: #f0f8ff; padding: 15px; border-radius: 6px; margin-bottom: 15px; border: 1px dashed #bddcf5; }
+    .loading { font-size: 0.8rem; color: var(--urjc-red); display: none; margin-left: 5px; font-weight: bold; }
+    .btn-group { display: flex; gap: 15px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; }
+    button { flex: 1; padding: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; color: white; font-size: 1rem; }
+    .btn-add { background: #27ae60; } .btn-gen { background: #2c3e50; } .btn-clr { background: #c0392b; }
+    button:hover { opacity: 0.9; transform: translateY(-1px); }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header-web">
+    <img src="https://i.postimg.cc/T3jKqd5j/log-EID-URJC.png" alt="Logo URJC">
+    <h1>INFORME DE MÉRITOS DE INVESTIGACIÓN<br><span style="font-size: 0.8em; font-weight:normal; color:#666;">DIRECCIÓN DE TESIS, EVALUACIÓN EXTERNA O TRIBUNALES</span></h1>
+  </div>
+
+  <form id="mainForm">
+    <h3>DATOS DE IDENTIFICACIÓN</h3>
+    <div class="form-grid">
+      <div class="col-3"><label>DNI/Pasaporte</label><input type="text" id="dni"></div>
+      <div class="col-4"><label>Nombre</label><input type="text" id="nombre"></div>
+      <div class="col-5"><label>Apellidos</label><input type="text" id="apellidos"></div>
+    </div>
+    <div class="form-grid">
+      <div class="col-6"><label>Doctor en</label><input type="text" id="doctor"></div>
+      <div class="col-2"><label>Año</label><input type="text" id="anio"></div>
+      <div class="col-4"><label>Institución Doctorado</label><input type="text" id="inst_doc"></div>
+    </div>
+    <div class="form-grid">
+      <div class="col-12"><label>Líneas Principales de Investigación</label><textarea id="lineas" rows="3"></textarea></div>
+    </div>
+
+    <h3>TRAYECTORIA ACADÉMICA E INVESTIGADORA</h3>
+    <div class="form-grid">
+      <div class="col-6">
+    <label>Cuerpo docente o profesional</label>
+    <input type="text" id="cuerpo" list="lista_cuerpos" placeholder="Seleccione o escriba...">
+    <datalist id="lista_cuerpos">
+        <option value="Catedrático/a de Universidad">
+        <option value="Profesor/a Titular de Universidad">
+        <option value="Profesor/a Contratado/a Doctor/a">
+        <option value="Profesor/a Ayudante Doctor/a">
+        <option value="Profesor/a Asociado/a">
+        <option value="Investigador/a Postdoctoral">
+
+    </datalist>
+</div>
+      <div class="col-6"><label>Institución</label><input type="text" id="inst_cuerpo"></div>
+    </div>
+    <div class="form-grid">
+      <div class="col-6"><label>Otra categoría/cargo</label><input type="text" id="cargo_extra"></div>
+      <div class="col-6"><label>Institución</label><input type="text" id="inst_extra"></div>
+    </div>
+    <div class="form-grid">
+      <div class="col-12"><label>Enlace al C.V. (Opcional)</label><input type="text" id="cv_link"></div>
+    </div>
+    <div class="form-grid">
+      <div class="col-4"><label>Factor Hirsch (h)</label><input type="text" id="h_index"></div>
+      <div class="col-4"><label>Pubs. JCR</label><input type="text" id="n_jcr"></div>
+      <div class="col-4"><label>Pubs. Q1</label><input type="text" id="n_q1"></div>
+    </div>
+
+    <h3>PUBLICACIONES (SEXENIO)</h3>
+    <div id="pubsContainer"></div>
+
+    <div class="btn-group">
+      <button type="button" class="btn-add" onclick="addPublication()">+ Añadir Publicación</button>
+      <button type="button" class="btn-gen" onclick="generateOfficialPDF()">Generar PDF Editable</button>
+      <button type="button" class="btn-clr" onclick="if(confirm('¿Borrar todo?')) location.reload()">Limpiar</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  let pubCount = 0;
+  const maxPubs = 5;
+
+  // 1. AÑADIR PUBLICACIÓN
+  function addPublication() {
+    if (pubCount >= maxPubs) return alert("Máximo 5 publicaciones permitidas.");
+    pubCount++;
+    const div = document.createElement("div");
+    div.className = "pub-card";
+    div.innerHTML = `
+      <div class="pub-badge">Publicación ${pubCount}</div>
+      <div class="api-tools">
+        <div class="form-grid" style="margin-bottom:0;">
+          <div class="col-6">
+            <label style="color: #2980b9;">Importar por DOI</label>
+            <input type="text" id="doi_${pubCount}" placeholder="Pegar DOI..." onblur="fetchDOI(${pubCount})">
+            <span id="load_${pubCount}" class="loading">Cargando...</span>
+          </div>
+          <div class="col-6">
+            <label style="color: #27ae60;">Importar por PMID</label>
+            <input type="text" id="pmid_${pubCount}" placeholder="Pegar PMID..." onblur="fetchPMID(${pubCount})">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="col-12"><label>Título</label><input type="text" id="tit_${pubCount}"></div>
+      </div>
+      <div class="form-grid">
+        <div class="col-12"><label>Autores</label><input type="text" id="aut_${pubCount}"></div>
+      </div>
+
+		<div class="form-grid">
+			<div class="col-4"><label>Revista</label><input type="text" id="rev_${pubCount}"></div>
+			<div class="col-2"><label>Año</label><input type="text" id="year_${pubCount}"></div>
+			<div class="col-2"><label>Vol.</label><input type="text" id="vol_${pubCount}"></div>
+			<div class="col-2"><label>Nº (Issue)</label><input type="text" id="iss_${pubCount}"></div>
+			<div class="col-1"><label>P. Ini</label><input type="text" id="p1_${pubCount}"></div>
+			<div class="col-1"><label>P. Fin</label><input type="text" id="p2_${pubCount}"></div>
+		</div>
+		
+
+      <div class="form-grid">
+		<div class="col-10">
+			<label>Categoría Indexación / OA (DOAJ)</label>
+			<input type="text" id="cat_${pubCount}" placeholder="Categoría o información de acceso abierto...">
+		</div>
+		
+		<div class="col-2">
+			<label>Posición (Q)</label>
+			<select id="pos_${pubCount}">
+				<option value="">Seleccione...</option>
+				<option value="Q1">Q1</option>
+				<option value="Q2">Q2</option>
+				<option value="Q3">Q3</option>
+				<option value="Q4">Q4</option>
+				<option value="NA">N/A</option>
+			</select>
+		</div>
+	</div>
+    `;
+    document.getElementById("pubsContainer").appendChild(div);
+  }
+
+  // 2. LÓGICA DE APIs
+  function clearFields(id) {
+    document.getElementById(`tit_${id}`).value = "";
+    document.getElementById(`aut_${id}`).value = "";
+    document.getElementById(`rev_${id}`).value = "";
+    document.getElementById(`pag_${id}`).value = "";
+    document.getElementById(`year_${id}`).value = "";
+    document.getElementById(`issn_${id}`).value = "";
+    document.getElementById(`cat_${id}`).value = "";
+  }
+
+ 
+ async function fetchDOI(id) {
+    const doiField = document.getElementById(`doi_${id}`);
+    const doi = doiField.value.trim();
+    
+    if (!doi) return;
+    document.getElementById(`pmid_${id}`).value = ""; 
+    
+    document.getElementById(`load_${id}`).style.display = 'inline';
+    try {
+        const res = await fetch(`https://api.crossref.org/works/${doi}`);
+        const json = await res.json();
+        const d = json.message;
+
+        // Separar páginas (ej: "145-156" -> ["145", "156"])
+        const pages = d.page ? d.page.split('-') : ["", ""];
+
+        fillFields(id, {
+            tit: d.title?.[0],
+            aut: d.author?.map(a => `${a.family}, ${a.given?.[0]}.`).join("; "),
+            rev: d["container-title"]?.[0],
+            year: d.issued?.["date-parts"]?.[0]?.[0],
+            vol: d.volume || "",
+            iss: d.issue || "",
+            p1: pages[0].trim(),
+            p2: (pages[1] || "").trim(),
+            issn: d.ISSN?.[0]
+        });
+        if (d.ISSN?.[0]) checkDOAJ(d.ISSN[0], id);
+    } catch(e) { console.error("Error DOI:", e); }
+    document.getElementById(`load_${id}`).style.display = 'none';
+}
+
+
+
+	 async function fetchPMID(id) {
+		const pmidField = document.getElementById(`pmid_${id}`);
+		const pmid = pmidField.value.trim();
+
+		if (!pmid) return;
+		document.getElementById(`doi_${id}`).value = "";
+
+		try {
+			const res = await fetch(`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${pmid}&retmode=json`);
+			const json = await res.json();
+			const d = json.result[pmid];
+			
+			// PubMed suele dar páginas como "145-56" o "145-156"
+			const pages = d.pages ? d.pages.split('-') : ["", ""];
+
+			fillFields(id, {
+				tit: d.title,
+				aut: d.authors?.map(a => a.name).join("; "),
+				rev: d.fulljournalname,
+				year: d.pubdate?.substring(0, 4),
+				vol: d.volume || "",
+				iss: d.issue || "",
+				p1: pages[0].trim(),
+				p2: (pages[1] || "").trim(),
+				issn: d.issn
+			});
+			if (d.issn) checkDOAJ(d.issn, id);
+		} catch(e) { console.error("Error PMID:", e); }
+	}
+
+  function checkDOAJ(issn, id) {
+    fetch(`https://doaj.org/api/v2/journals/${issn}`)
+      .then(r => r.json())
+      .then(d => {
+        const current = document.getElementById(`cat_${id}`).value;
+        // Solo si encontramos datos en DOAJ
+        if(d.results && d.results.length > 0) {
+            const isOA = "OPEN ACCESS (DOAJ)";
+            document.getElementById(`cat_${id}`).value = isOA + (current ? " \n " + current : "");
+        }
+      }).catch(()=>null);
+  }
+
+ function fillFields(id, data) {
+    if(data.tit) document.getElementById(`tit_${id}`).value = data.tit;
+    if(data.aut) document.getElementById(`aut_${id}`).value = data.aut;
+    if(data.rev) document.getElementById(`rev_${id}`).value = data.rev;
+    if(data.year) document.getElementById(`year_${id}`).value = data.year;
+    if(data.vol) document.getElementById(`vol_${id}`).value = data.vol;
+    if(data.iss) document.getElementById(`iss_${id}`).value = data.iss;
+    if(data.p1) document.getElementById(`p1_${id}`).value = data.p1;
+    if(data.p2) document.getElementById(`p2_${id}`).value = data.p2;
+    if(data.issn) document.getElementById(`issn_${id}`).value = data.issn;
+}
+
+
+  // 3. GENERADOR DE PDF "EDITABLE" (ACROFORMS)
+  async function generateOfficialPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+	
+	// Para poder meter encabezados
+	const drawHeader = () => {
+    const logoUrl = "https://i.postimg.cc/T3jKqd5j/log-EID-URJC.png";
+    try { 
+        doc.addImage(logoUrl, "PNG", 15, 12, 60, 25); 
+    } catch(e) {}
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    const title = "INFORME DE MÉRITOS DE INVESTIGACIÓN PARA DIRECCIÓN DE TESIS, EVALUACIÓN EXTERNA O PARTICIPACIÓN EN TRIBUNAL DE TESIS DOCTORAL";
+    doc.text(doc.splitTextToSize(title, 110), 85, 20);
+};
+
+    // ===== Helpers para campos Coordinados =====
+
+// TextField editable (Mantiene multilínea para títulos largos)
+// TextField editable (Multilínea)
+	const createField = (label, val, x, y, w, h, fieldName) => {
+	  doc.setFont("helvetica", "bold");
+	  doc.setFontSize(9);
+	  const labelWidth = doc.getTextWidth(label);
+	  
+	  // SUBIMOS LA ETIQUETA: Usamos y - 3 para que se alinee con el texto superior
+	  doc.text(label, x, y - 3);
+
+	  const textField = new doc.AcroFormTextField();
+	  // El Rect se mantiene igual, pero ahora la etiqueta está a su altura
+	  // SOLUCIÓN al problema de que no se vea el paréntesis salvo al entrar al campo: 
+	  // 1. Aumentamos h a 7.5 para dar aire vertical
+	  // 2. Restamos un poco más al ancho (w - labelWidth - 5) para asegurar que el final no toque el borde
+	  const fieldX = x + labelWidth + 2;
+	  const fieldW = w - labelWidth - 4; // Un poco más de margen al final
+	  
+	  textField.Rect = [fieldX, y - 6.5, fieldW, 7.5]; 
+	  textField.multiline = true;
+	  textField.value = val || " "; // meto espacio para que deje detrás y así se visualice tras el ajuste del renderizado. Lo del ) en campo Doctor en año.
+	  textField.fieldName = fieldName;
+	  textField.fontSize = 9;
+	  
+	  // Forzamos que el texto no se pegue a los bordes (si tu versión de jsPDF lo soporta)
+	  textField.appearanceState = 'Normal'; 
+	  
+	  doc.addField(textField);
+
+	  // Línea de base: la bajamos medio punto para que no toque las letras
+	  doc.setDrawColor(220);
+	  doc.line(fieldX, y + 0.5, fieldX + fieldW, y + 0.5);
+	};
+
+	// ComboBox (desplegable)
+	const createComboField = (label, options, selectedValue, x, y, w, h, fieldName, docRef) => {
+	  docRef.setFont("helvetica", "bold");
+	  docRef.setFontSize(9);
+	  const labelWidth = docRef.getTextWidth(label);
+	  
+	  // SUBIMOS LA ETIQUETA igual que en el TextField
+	  docRef.text(label, x, y - 3);
+
+	  const combo = new docRef.AcroFormComboBox();
+	  combo.Rect = [x + labelWidth + 2, y - 5, w - labelWidth - 2, 7];
+	  combo.fieldName = fieldName;
+	  combo.fontSize = 9;
+	  combo.combo = true;
+	  combo.edit = false;
+	  combo.commitOnSelChange = true;
+	  combo.setOptions(options);
+
+	  if (selectedValue && options.includes(selectedValue)) {
+		combo.value = selectedValue;      
+		combo.defaultValue = selectedValue;
+	  }
+	  docRef.addField(combo);
+	};
+    // ===== Recogida de datos =====
+    const getData = (id) => document.getElementById(id).value;
+    // 1. Corregimos el paréntesis de cierre aquí:
+	// ===== Recogida de datos =====
+
+	const identificacion = [
+		[{ l: "DNI/Pasaporte:", v: getData("dni"), k: "dni" }], // Fila 1 (1 col)
+		[ // Fila 2 (2 cols)
+			{ l: "Apellidos:", v: getData("apellidos"), k: "apellidos_pdf" },
+			{ l: "Nombre:",    v: getData("nombre"),    k: "nombre_pdf" }
+		],
+		[ // Fila 3 (2 cols)
+			{ l: "Doctor en:", v: getData("doctor"), k: "doctor_pdf" },
+			{ l: "Año:",       v: getData("anio"),   k: "anio_pdf" }
+		],
+		[{ l: "Institución:", v: getData("inst_doc"), k: "inst_doc" }] // Fila 4 (1 col)
+	];
+
+    // ===== DISEÑO PÁGINA 1 =====
+	drawHeader(); // Llama a la función que acabamos de crear
+   // const logoUrl = "https://i.postimg.cc/T3jKqd5j/log-EID-URJC.png";
+   //  try { doc.addImage(logoUrl, "PNG", 15, 12, 60, 25); } catch(e) {}
+   //  doc.setFont("helvetica", "bold");
+   //  doc.setFontSize(11);
+   //  doc.text(doc.splitTextToSize("INFORME DE MÉRITOS DE INVESTIGACIÓN PARA DIRECCIÓN DE TESIS, EVALUACIÓN EXTERNA O PARTICIPACIÓN EN TRIBUNAL DE TESIS DOCTORAL", 110), 85, 20);
+
+    
+// BLOQUE 1: DATOS (Estructura corregida para evitar errores de generación)
+// Definimos el ancho total para asegurar alineación vertical
+		const totalWidth = 180; 
+
+		// 1. TABLA APELLIDOS Y NOMBRE
+		doc.autoTable({
+			startY: 55,
+			theme: 'plain',
+			head: [['DATOS DE IDENTIFICACIÓN', '']], 
+			body: [
+				[{ content: "DNI: " + getData("dni"), colSpan: 2 }],
+				[{ l: "Apellidos:", v: getData("apellidos"), k: "apellidos_pdf" }, { l: "Nombre:", v: getData("nombre"), k: "nombre_pdf" }]
+			],
+			headStyles: { fillColor: [240, 240, 240], textColor: 0, fontStyle: 'bold', lineWidth: 0 },
+			styles: { fontSize: 10, cellPadding: 4, lineColor: 0, lineWidth: 0, minCellHeight: 12 },
+			columnStyles: { 0: { cellWidth: 100 }, 1: { cellWidth: 80 } },
+			didDrawCell: (data) => {
+				// --- NUEVA LÓGICA PARA BORDES DE CABECERA ---
+				if (data.section === 'head') {
+					doc.setDrawColor(0);
+					doc.setLineWidth(0.1);
+					const cell = data.cell;
+					// Línea superior del gris
+					doc.line(cell.x, cell.y, cell.x + cell.width, cell.y);
+					// Líneas laterales del gris
+					if (data.column.index === 0) doc.line(cell.x, cell.y, cell.x, cell.y + cell.height);
+					if (data.column.index === 1) doc.line(cell.x + cell.width, cell.y, cell.x + cell.width, cell.y + cell.height);
+				}
+
+				// --- LÓGICA EXISTENTE PARA EL CUERPO ---
+				if (data.section === 'body') {
+					dibujarCampoEnCelda(data, data.row.index === 0 ? 
+						[{ l: "DNI/Pasaporte:", v: getData("dni"), k: "dni" }] : 
+						[{ l: "Apellidos:", v: getData("apellidos"), k: "apellidos_pdf" }, { l: "Nombre:", v: getData("nombre"), k: "nombre_pdf" }]
+					);
+				}
+			}
+		});
+
+		// 2. TABLA DOCTOR Y AÑO (145 + 35 = 180)
+		doc.autoTable({
+			startY: doc.lastAutoTable.finalY,
+			theme: 'plain',
+			body: [[
+				{ l: "Doctor en:", v: getData("doctor"), k: "doctor_pdf" },
+				{ l: "Año:",       v: getData("anio"),   k: "anio_pdf" }
+			]],
+			styles: { fontSize: 10, cellPadding: 4, lineColor: 0, lineWidth: 0, minCellHeight: 12 },
+			columnStyles: {
+				0: { cellWidth: 145 }, // Doctorado largo
+				1: { cellWidth: 35 }   // Año corto (145 + 35 = 180)
+			},
+			didDrawCell: (data) => dibujarCampoEnCelda(data, [
+				{ l: "Doctor en:", v: getData("doctor"), k: "doctor_pdf" }, 
+				{ l: "Año:", v: getData("anio"), k: "anio_pdf" }
+			])
+		});
+
+		// 3. TABLA INSTITUCIÓN (180 = 180)
+		doc.autoTable({
+			startY: doc.lastAutoTable.finalY,
+			theme: 'plain',
+			body: [[{ l: "Institución:", v: getData("inst_doc"), k: "inst_doc" }]],
+			styles: { fontSize: 10, cellPadding: 4, lineColor: 0, lineWidth: 0, minCellHeight: 12 },
+			columnStyles: { 0: { cellWidth: 180 } }, // Ancho completo
+			didDrawCell: (data) => dibujarCampoEnCelda(data, [{ l: "Institución:", v: getData("inst_doc"), k: "inst_doc" }])
+		});
+
+		// --- LA FUNCIÓN MÁGICA DE DIBUJO ---
+		function dibujarCampoEnCelda(data, itemsFila) {
+			if (data.section === 'body') {
+				const item = itemsFila.length === 1 ? itemsFila[0] : itemsFila[data.column.index];
+				if (item) {
+					const cell = data.cell;
+					doc.setDrawColor(0);
+					doc.setLineWidth(0.1);
+
+					// Borde Izquierdo (si es la primera columna)
+					if (data.column.index === 0) doc.line(cell.x, cell.y, cell.x, cell.y + cell.height);
+					// Borde Derecho (si es la última columna)
+					if (data.column.index === itemsFila.length - 1) doc.line(cell.x + cell.width, cell.y, cell.x + cell.width, cell.y + cell.height);
+					// Borde Inferior (siempre)
+					doc.line(cell.x, cell.y + cell.height, cell.x + cell.width, cell.y + cell.height);
+
+					// Fondo blanco y campo
+					doc.setFillColor(255, 255, 255);
+					doc.rect(cell.x + 0.5, cell.y + 0.5, cell.width - 1, cell.height - 1, 'F');
+					createField(item.l, item.v, cell.x + 2, cell.y + 8, cell.width - 4, 8, item.k);
+				}
+			}
+		}
+		// Línea superior de cierre (15 a 195 = 180mm)
+		doc.line(15, 55, 195, 55);
+
+
+    // Líneas de investigación
+	let finalY = doc.lastAutoTable.finalY;
+	doc.setFont("helvetica", "bold");
+	doc.setFontSize(10);
+	doc.text("LÍNEAS PRINCIPALES DE INVESTIGACIÓN:", 15, finalY + 8); 
+
+	// --- DIBUJAMOS EL RECUADRO (Para que coincida con Identificación) ---
+	doc.setLineWidth(0.1);
+	doc.setDrawColor(0);
+	// Usamos las mismas coordenadas que el Rect del campo
+	doc.rect(15, finalY + 10, 180, 8, 'S'); 
+
+	const lineasField = new doc.AcroFormTextField();
+	lineasField.Rect = [15, finalY + 10, 180, 8]; 
+	lineasField.multiline = true;
+	lineasField.value = (getData("lineas") || "") + " "; // Tu truco del espacio
+	lineasField.fieldName = "lineas_investigacion";
+	lineasField.fontSize = 9;
+	doc.addField(lineasField);
+	finalY = finalY + 10;
+
+    // BLOQUE 2: TRAYECTORIA (Cabecera gris)
+	// BLOQUE 2: TRAYECTORIA (Estructura de Tabla para bordes perfectos)
+		const datosTrayectoria = [
+			{ l: "Cuerpo docente:", v: getData("cuerpo"), k: "cuerpo_pdf" },
+			{ l: "Institución:",    v: getData("inst_cuerpo"), k: "inst_cuerpo_pdf" },
+			{ l: "Otro cargo:",     v: getData("cargo_extra"), k: "cargo_extra_pdf" },
+			{ l: "Institución extra:", v: getData("inst_extra"), k: "inst_extra_pdf" },
+			{ l: "CV Link:",        v: getData("cv_link"), k: "cv_link_pdf" }
+		];
+
+		doc.autoTable({
+			startY: finalY + 35,
+			theme: 'plain',
+			head: [['TRAYECTORIA ACADÉMICA E INVESTIGADORA']],
+			body: datosTrayectoria.map(i => [i.l]), // Creamos las filas de la tabla
+			headStyles: { fillColor: [240, 240, 240], textColor: 0, fontStyle: 'bold' },
+			styles: { fontSize: 10, cellPadding: 4, lineColor: 0, lineWidth: 0.1, minCellHeight: 12 },
+			didDrawCell: function(data) {
+				if (data.section === 'body') {
+					const item = datosTrayectoria[data.row.index];
+					const cell = data.cell;
+
+					// Limpiamos la celda
+					doc.setFillColor(255, 255, 255);
+					doc.rect(cell.x + 0.5, cell.y + 0.5, cell.width - 1, cell.height - 1, 'F');
+
+					// Insertamos el campo (usamos el mismo ajuste y+8)
+					createField(item.l, item.v, cell.x + 2, cell.y + 8, cell.width - 4, 8, item.k);
+				}
+			}
+		});
+
+		// Para las MÉTRICAS (H-Index, JCR, Q1) en una sola fila
+		let yMetricas = doc.lastAutoTable.finalY + 5;
+		const metricas = [
+			{ l: "H-Index:", v: getData("h_index"), k: "h_pdf" },
+			{ l: "JCR:",     v: getData("n_jcr"), k: "jcr_pdf" },
+			{ l: "Q1:",      v: getData("n_q1"), k: "q1_pdf" }
+		];
+
+		doc.autoTable({
+			startY: yMetricas,
+			theme: 'plain',
+			body: [metricas.map(m => m.l)], // Esto crea 1 fila con 3 columnas
+			styles: { fontSize: 10, cellPadding: 4, lineColor: 0, lineWidth: 0.1, minCellHeight: 12 },
+			didDrawCell: function(data) {
+				if (data.section === 'body') {
+					const item = metricas[data.column.index];
+					const cell = data.cell;
+					doc.setFillColor(255, 255, 255);
+					doc.rect(cell.x + 0.5, cell.y + 0.5, cell.width - 1, cell.height - 1, 'F');
+					createField(item.l, item.v, cell.x + 2, cell.y + 8, cell.width - 4, 8, item.k);
+				}
+			}
+		});
+
+		finalY = doc.lastAutoTable.finalY + 10;
+
+
+
+    // ===== PÁGINA 2: PUBLICACIONES =====
+		doc.addPage();
+		drawHeader();
+
+		
+
+	// 1. Título centrado (con tamaño corregido)
+	doc.setFontSize(11);
+	doc.setFont("helvetica", "bold");
+	const pageWidth = doc.internal.pageSize.getWidth();
+	doc.text("PUBLICACIONES QUE CUMPLEN CRITERIO DE SEXENIO DE INVESTIGACIÓN", pageWidth / 2, 45, { align: "center" });
+
+	// 2. Bloque de introducción (Usando la lógica del texto legal pero sin bordes)
+	const intro = "Indique a continuación qué 5 publicaciones de un período de 6 años escogería para su evaluación según los criterios establecidos por la CNEAI (Resolución de 9 de diciembre de 2024, de la Comisión Nacional Evaluadora de la Actividad Investigadora, por la que se publican los criterios específicos aprobados para cada uno de los campos de evaluación) para optar al sexenio de investigación.";
+
+	doc.autoTable({
+		startY: 52,
+		margin: {top: 45, left: 15, right: 15 },
+		body: [[intro]],
+		theme: 'plain', // Sin colores de fondo ni bordes de tabla
+		styles: {
+			fontSize: 7,
+			font: "helvetica",
+			fontStyle: "normal",
+			halign: 'justify', // Justificación perfecta garantizada
+			cellPadding: 0,    // Pegado al margen
+			lineColor: 255     // Bordes blancos (invisibles)
+		},
+		didDrawPage: (data) => {
+        if (data.pageNumber > 1) {
+            drawHeader();
+        }
+		}
+	});
+
+	// Para continuar dibujando después de este bloque, usamos el finalY de esta "tabla" invisible
+	let currentY = doc.lastAutoTable.finalY + 10;
+
+
+   let pubY = currentY; 
+    for (let i = 1; i <= pubCount; i++) {
+        // 1. Salto de página con header
+        if (pubY > 235) { 
+            doc.addPage(); 
+            drawHeader(); // No olvides llamar al header manual aquí
+            pubY = 50; 
+        }
+
+        // 2. Caja contenedora más esbelta (48mm de alto en lugar de 60)
+        doc.setDrawColor(200); 
+        doc.setFillColor(252, 252, 252);
+        doc.rect(14, pubY - 2, 182, 48, 'FD'); 
+
+        // 3. Cabecera de la publicación (Rojo URJC: 204, 0, 0)
+        doc.setFillColor(240, 240, 240);
+        doc.rect(15, pubY, 180, 7, 'F'); // Un poco más fina (7mm)
+        doc.setDrawColor(204, 0, 0); // Borde rojo URJC
+        doc.rect(15, pubY, 180, 7, 'S');
+        
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(204, 0, 0); // Texto en rojo
+        doc.text(`Publicación ${i}`, 17, pubY + 5);
+        doc.setTextColor(0); // Reset a negro para el resto
+
+        // --- REAJUSTE DE ÍNDICES (Reducimos los incrementos de pubY) ---
+        pubY += 16; // Bajamos de la cabecera al título (antes era 15)
+
+        // Título
+        createField("Título:", getData(`tit_${i}`), 15, pubY, 180, 8, `pub_${i}_tit`);
+        pubY += 9; // Antes 10
+        
+        // Autores
+        createField("Autores:", getData(`aut_${i}`), 15, pubY, 180, 8, `pub_${i}_aut`);
+        pubY += 9; // Antes 10
+        
+        // Referencia combinada
+        const xRev = 15; const xAnio = 90; const xVol = 115; const xNum = 140; const xPag = 165;
+        createField("Revista:", getData(`rev_${i}`), xRev, pubY, 70, 8, `pub_${i}_rev`);
+        createField("Año:", getData(`year_${i}`), xAnio, pubY, 22, 8, `pub_${i}_yr`);
+        createField("Vol:", getData(`vol_${i}`), xVol, pubY, 22, 8, `pub_${i}_vol`);
+        createField("Nº:", getData(`iss_${i}`), xNum, pubY, 22, 8, `pub_${i}_iss`);
+        
+        const pags = `${getData(`p1_${i}`)}${getData(`p2_${i}`) ? '-' + getData(`p2_${i}`) : ''}`;
+        createField("Págs:", pags, xPag, pubY, 30, 8, `pub_${i}_pags`);
+
+        pubY += 9; // Antes 12
+
+        // Métricas y Q
+        createField("Categoría:", getData(`cat_${i}`), 15, pubY, 120, 8, `pub_${i}_cat`);
+        const qHTML = getData(`pos_${i}`);
+        const quartilOptions = ["Q1", "Q2", "Q3", "Q4", "NA"];
+        createComboField("Posición (Q):", quartilOptions, qHTML, 140, pubY, 50, 8, `pub_${i}_pos`, doc);
+
+        // --- EL SALTO FINAL ---
+        // Al final del bloque, sumamos 12mm para dejar un hueco de 4mm entre cajas
+        pubY += 11; 
+    }
+
+   // ===== FIRMA Y LEGAL =====
+
+// ===== FIRMA Y LEGAL (Versión Editable y Coherente) =====
+		if (pubY > 185) { 
+			doc.addPage(); 
+			drawHeader();
+			pubY = 50; 
+		} 
+		const signY = pubY + 10;
+
+		doc.setFont("helvetica", "bold");
+		doc.setFontSize(10);
+		doc.text("Fecha y firma:", 15, signY);
+
+		// 1. Recuadro de firma (Visual)
+		doc.setLineWidth(0.5);
+		doc.setDrawColor(0);
+		doc.rect(15, signY + 5, 80, 25, 'S'); 
+
+		doc.setFont("helvetica", "normal");
+		doc.setFontSize(8);
+		doc.setTextColor(150);
+		doc.text("Espacio reservado para firma", 28, signY + 18);
+		doc.setTextColor(0);
+
+		// 2. Ciudad y Fecha EDITABLES
+		const fechaHoy = new Date().toLocaleDateString('es-ES', { 
+			day: '2-digit', month: '2-digit', year: 'numeric' 
+		});
+
+		// Usamos createField para la Ciudad
+		createField("En:", "Madrid", 110, signY + 12, 85, 8, "ciudad_firma");
+
+		// Usamos createField para la Fecha (permitiendo que el usuario la corrija)
+		createField("a fecha de:", fechaHoy, 110, signY + 22, 85, 8, "fecha_firma");
+
+		// 3. BLOQUE LEGAL
+		const legalText = "Los datos personales recogidos serán incorporados y tratados en los sistemas de tratamiento de la Universidad Rey Juan Carlos. El tratamiento tiene como finalidad la gestión de los expedientes académicos de sus estudiantes y darles acceso a los servicios universitarios correspondientes. Los datos personales recogidos serán conservados durante el tiempo necesario para el cumplimiento de los fines anteriormente mencionados. El órgano responsable del tratamiento es el Vicerrectorado de Postgrado y los datos se tratan en el ejercicio de potestades públicas conferidas por la Ley, en aplicación de la Ley Orgánica de Universidades, así como en cumplimiento de una obligación legal. Los datos personales únicamente podrán ser cedidos en los casos previstos en la Ley. El órgano responsable del tratamiento es el Vicerrectorado de Postgrado, y la dirección donde el interesado podrá ejercer sus derechos es el Registro General, c/Tulipán, s/n, 28933 Móstoles (Madrid). Puede consultar la política de protección de datos de la Universidad Rey Juan Carlos en la página web www.urjc.es. Todo lo cual se informa en cumplimiento del artículo 13 del Reglamento UE 679/2016, de 27 de abril, general de protección de Datos, y 11 de la Ley Orgánica 3/2018, de 5 de diciembre, de protección de datos de carácter personal y garantía de los derechos digitales.";
+
+		doc.autoTable({
+			startY: signY + 35,
+			body: [[legalText]],
+			styles: { 
+				fontSize: 7, 
+				halign: 'justify', 
+				cellPadding: 3, 
+				lineColor: 180, 
+				lineWidth: 0.1 
+			},
+			theme: 'plain',
+			margin: { left: 15, right: 15 },
+			didDrawPage: function(data) {
+			if (data.pageNumber > 1) {
+				drawHeader();
+			}
+			}
+		});   
+
+		// ===== JSON OCULTO (PÁGINA EXTRA) =====
+   // 1. Preparamos el objeto con los datos (asegúrate de que los IDs coincidan)
+   // ===== RECOGIDA TOTAL DE DATOS PARA R =====
+		const exportData = {
+			// Datos Personales e Identificación
+			investigador: {
+				dni: getData("dni"),
+				nombre: getData("nombre"),
+				apellidos: getData("apellidos"),
+				doctor_en: getData("doctor"),
+				doctor_anio: getData("anio"),
+				doctor_inst: getData("inst_doc"),
+				lineas_investigacion: getData("lineas")
+			},
+			// Trayectoria Académica
+			trayectoria: {
+				cuerpo: getData("cuerpo"),
+				inst_cuerpo: getData("inst_cuerpo"),
+				cargo_extra: getData("cargo_extra"),
+				inst_extra: getData("inst_extra"),
+				cv_link: getData("cv_link")
+			},
+			// Métricas de Impacto
+			metricas: {
+				h_index: getData("h_index"),
+				total_jcr: getData("n_jcr"),
+				total_q1: getData("n_q1")
+			},
+			// Listado de Publicaciones del Sexenio
+			pubs: []
+		};
+
+		// Bucle para las publicaciones
+		for (let i = 1; i <= pubCount; i++) {
+			exportData.pubs.push({
+				indice: i,
+				doi: document.getElementById(`doi_${i}`)?.value || "",
+				pmid: document.getElementById(`pmid_${i}`)?.value || "",
+				titulo: getData(`tit_${i}`),
+				autores: getData(`aut_${i}`),
+				revista: getData(`rev_${i}`),
+				anio: getData(`year_${i}`),
+				vol: getData(`vol_${i}`),
+				iss: getData(`iss_${i}`),
+				pags: `${getData(`p1_${i}`)}-${getData(`p2_${i}`)}`,
+				categoria_oa: getData(`cat_${i}`),
+				cuartil: getData(`pos_${i}`)
+			});
+		}
+
+		// ===== METADATOS E INVISIBILIDAD =====
+		doc.setProperties({
+			title: `Informe_Meritos_${getData("apellidos")}`,
+			author: "URJC - EID",
+			subject: JSON.stringify(exportData), // Todo el formulario comprimido aquí
+			keywords: "meritos, investigacion, sexenio, urjc",
+			creator: "Sistema EID URJC"
+		});
+
+		// Guardar con nombre limpio
+		const safeApp = getData("apellidos").replace(/[^a-z0-9]/gi, '_').toLowerCase();
+		doc.save(`Informe_Meritos_${safeApp}.pdf`);
+  }
+</script>
+</body>
+</html>
